@@ -32,6 +32,7 @@ spec:
           name: syslog-ng-volume
       - name: promtail
         image: grafana/promtail:2.5.0
+        imagePullPolicy: IfNotPresent        
         volumeMounts:
         - mountPath: /logs/hosts
           name: syslog-ng-volume
