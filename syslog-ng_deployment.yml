@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: syslog-ng
+  name: syslog-ng
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: syslog-ng
+  template:
+    metadata:
+      labels:
+        app: syslog-ng
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Asia/Taipei
+        - name: PUID
+          value: "0"
+        image: linuxserver/syslog-ng
+        imagePullPolicy: IfNotPresent
+        name: syslog-ng
+        securityContext:
+          capabilities:
+            add:
+            - CAP_NET_RAW
+        volumeMounts:
+        - mountPath: /var/log
+          name: syslog-ng-volume
+      - name: promtail
+        image: grafana/promtail:2.5.0
+        volumeMounts:
+        - mountPath: /logs/hosts
+          name: syslog-ng-volume
+        - name: promtail-config-volume
+          mountPath: /etc/promtail/config.yml
+          subPath: config.yml
+      securityContext:
+        fsGroup: 0
+      volumes:
+      - name: syslog-ng-volume
+        persistentVolumeClaim:
+          claimName: syslog-ng-pvc
+      - name: promtail-config-volume
+        configMap:
+          name: syslog-ng-configmap          
