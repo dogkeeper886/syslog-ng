@@ -16,6 +16,16 @@ data:
         labels:
           job: syslog-ng
           __path__: /logs/hosts/*
+      pipeline_stages:
+      - match:
+          selector: '{job="syslog-ng"}'
+          stages:
+            - regex:
+                    expression: "^\\w{3} \\d+ \\d{2}:\\d{2}:\\d{2} (?P<TRANSPORT>\\d+\\.\\d+\\.\\d+\\.\\d+) (?P<SYSLOG_IDENTIFIER>(\\w+|\\w+-\\w+))(\\:|\\[\\d+\\]:)"
+            - labels:
+                TRANSPORT:
+                SYSLOG_IDENTIFIER:
+
 kind: ConfigMap
 metadata:
   name: syslog-ng-configmap
